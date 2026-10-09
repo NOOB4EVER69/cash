@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#14213d">
+  <title>Fazara — ScanTill</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Courier+Prime&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eef2f4;
+      --ink: #14213d;
+      --mute: #5b6878;
+      --teal: #0e5a58;
+      --tint: #d8ecea;
+      --red: #b42318;
+      --line: #d5dce2;
+      --paper: #fffef8;
+      --sb: env(safe-area-inset-bottom, 0px)
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    [hidden] {
+      display: none !important
+    }
+
+    html {
+      scroll-padding-top: 70px
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.4 "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      touch-action: manipulation;
+      padding-bottom: calc(150px + var(--sb))
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      padding-top: calc(10px + env(safe-area-inset-top, 0px));
+      background: var(--ink);
+      color: #fff
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+      white-space: nowrap
+    }
+
+    .brand small {
+      font-weight: 400;
+      font-size: 12px;
+      opacity: .6;
+      margin-left: 6px
+    }
+
+    .chip {
+      font-size: 13px;
+      background: #ffffff22;
+      padding: 6px 12px;
+      border-radius: 99px;
+      margin-left: auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0
+    }
+
+    nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 6;
+      display: flex;
+      background: #fff;
+      border-top: 1px solid var(--line);
+      padding-bottom: var(--sb)
+    }
+
+    nav button {
+      flex: 1;
+      display: grid;
+      justify-items: center;
+      gap: 2px;
+      min-height: 58px;
+      background: none;
+      border: 0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--mute);
+      cursor: pointer
+    }
+
+    nav button i {
+      font-style: normal;
+      font-size: 22px;
+      line-height: 1
+    }
+
+    nav button.on {
+      color: var(--teal);
+      box-shadow: inset 0 3px 0 var(--teal)
+    }
+
+    main {
+      max-width: 1140px;
+      margin: 14px auto;
+      padding: 0 12px
+    }
+
+    .tab {
+      display: none
+    }
+
+    .tab.on {
+      display: block
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 400px;
+      gap: 16px;
+      align-items: start
+    }
+
+    .grid.two {
+      grid-template-columns: 360px minmax(0, 1fr)
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 18px
+    }
+
+    .card h2 span {
+      color: var(--mute);
+      font-weight: 400;
+      font-size: 15px
+    }
+
+    .viewer {
+      position: relative;
+      background: #0d1a1f;
+      border-radius: 12px;
+      height: 190px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: #cdd8dc;
+      text-align: center;
+      padding: 10px
+    }
+
+    video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none
+    }
+
+    .laser {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      top: 50%;
+      height: 2px;
+      background: #ff3b4e;
+      box-shadow: 0 0 14px #ff3b4e;
+      display: none;
+      animation: sw 2s ease-in-out infinite alternate
+    }
+
+    @keyframes sw {
+      from {
+        top: 28%
+      }
+
+      to {
+        top: 72%
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .laser {
+        animation: none
+      }
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      min-height: 48px;
+      padding: 0 18px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      background: #e6ecf0;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .btn.p {
+      background: var(--teal);
+      color: #fff
+    }
+
+    .btn.d {
+      color: var(--red);
+      background: #fdeceb
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
+
+    .btn:active {
+      transform: scale(.97)
+    }
+
+    .btn.big {
+      flex: 1
+    }
+
+    input,
+    select {
+      font: inherit;
+      font-size: 16px;
+      border: 1.5px solid #c5cfd8;
+      border-radius: 12px;
+      min-height: 48px;
+      padding: 0 12px;
+      background: #fff;
+      min-width: 0;
+      color: var(--ink)
+    }
+
+    input[type=checkbox] {
+      min-height: 0;
+      width: 22px;
+      height: 22px;
+      accent-color: var(--teal)
+    }
+
+    input:focus-visible,
+    select:focus-visible,
+    button:focus-visible {
+      outline: 3px solid #0e5a5880;
+      outline-offset: 1px
+    }
+
+    .w {
+      width: 100%
+    }
+
+    .big2 {
+      flex: 1;
+      font-size: 17px
+    }
+
+    .lb {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--mute);
+      margin: 12px 0 5px
+    }
+
+    .row .lb {
+      margin: 0
+    }
+
+    .hint {
+      color: var(--mute);
+      font-size: 14px;
+      margin: 10px 0 0;
+      min-height: 20px
+    }
+
+    .sw {
+      font-size: 14px;
+      color: var(--mute);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      min-height: 44px
+    }
+
+    .found {
+      margin-top: 12px;
+      border: 2px solid var(--teal);
+      background: var(--tint);
+      border-radius: 14px;
+      padding: 14px
+    }
+
+    .f2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    .fc {
+      font-size: 12px;
+      color: var(--mute);
+      margin: 4px 0 2px;
+      word-break: break-all
+    }
+
+    .lnk {
+      border: 0;
+      background: none;
+      color: var(--teal);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      padding: 0 8px
+    }
+
+    a.lnk {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: underline
+    }
+
+    .receipt {
+      position: sticky;
+      top: 70px
+    }
+
+    .paper {
+      background: var(--paper);
+      font-family: "Courier Prime", "Courier New", monospace;
+      font-size: 14px;
+      padding: 16px 14px 22px;
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 8px 22px #14213d22;
+      position: relative;
+      margin-bottom: 22px
+    }
+
+    .paper::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -10px;
+      height: 10px;
+      background: linear-gradient(135deg, var(--paper) 25%, transparent 25%) -6px 0, linear-gradient(225deg, var(--paper) 25%, transparent 25%) -6px 0;
+      background-size: 12px 12px
+    }
+
+    .ph2 {
+      text-align: center;
+      border-bottom: 1px dashed #b9b6a8;
+      padding-bottom: 8px;
+      margin-bottom: 4px
+    }
+
+    .ph2 b {
+      font-size: 17px
+    }
+
+    .ph2 div {
+      font-size: 12px;
+      color: var(--mute)
+    }
+
+    .ln {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dotted #d4d0c2
+    }
+
+    .ln .nm {
+      overflow-wrap: anywhere;
+      font-weight: 700
+    }
+
+    .ln small {
+      display: block;
+      font-weight: 400;
+      color: var(--mute);
+      font-size: 12px
+    }
+
+    .amt {
+      font-weight: 700;
+      text-align: right
+    }
+
+    .q {
+      display: flex;
+      align-items: center;
+      gap: 2px
+    }
+
+    .q button {
+      width: 44px;
+      height: 44px;
+      border: 1px solid #cfcab8;
+      background: #fff;
+      border-radius: 10px;
+      font-size: 20px;
+      cursor: pointer
+    }
+
+    .q b {
+      min-width: 26px;
+      text-align: center
+    }
+
+    .po {
+      display: none
+    }
+
+    .tr {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 3px 0
+    }
+
+    .tr.g {
+      font-size: 19px;
+      font-weight: 700;
+      border-top: 1px dashed #b9b6a8;
+      margin-top: 6px;
+      padding-top: 9px
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--mute);
+      padding: 26px 10px;
+      font: 14px "Bricolage Grotesque", system-ui, sans-serif
+    }
+
+    .chg {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      min-height: 28px
+    }
+
+    .chg.bad {
+      color: var(--red)
+    }
+
+    .chg.ok {
+      color: var(--teal)
+    }
+
+    .pm {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px
+    }
+
+    .pm button {
+      border: 2px solid var(--line);
+      background: #fff;
+      border-radius: 12px;
+      min-height: 48px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--ink)
+    }
+
+    .pm button.on {
+      border-color: var(--teal);
+      background: var(--tint);
+      color: var(--teal)
+    }
+
+    .vd {
+      opacity: .5;
+      text-decoration: line-through
+    }
+
+    .heldBox {
+      margin-top: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 8px;
+      font-size: 14px
+    }
+
+    .th {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #f3f5f7;
+      flex: none
+    }
+
+    .pk {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      min-height: 56px
+    }
+
+    .pk:active {
+      background: #fff
+    }
+
+    .pk small {
+      display: block;
+      color: var(--mute)
+    }
+
+    .pi {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 8px 0
+    }
+
+    .pi img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 8px
+    }
+
+    #shift .tr {
+      padding: 7px 0;
+      border-bottom: 1px dotted var(--line)
+    }
+
+    #shift .tr.g {
+      font-size: 17px
+    }
+
+    #bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: calc(58px + var(--sb));
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--ink);
+      color: #fff
+    }
+
+    #bar div {
+      flex: 1;
+      line-height: 1.2
+    }
+
+    #bar small {
+      opacity: .7;
+      display: block
+    }
+
+    #bar b {
+      font-size: 20px
+    }
+
+    #toast {
+      position: fixed;
+      bottom: calc(140px + var(--sb));
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      max-width: 92vw;
+      z-index: 9;
+      box-shadow: 0 10px 30px #0004
+    }
+
+    #toast button {
+      background: none;
+      border: 0;
+      color: #7fe0d4;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 44px
+    }
+
+    .flash {
+      animation: fl .5s
+    }
+
+    @keyframes fl {
+      from {
+        box-shadow: 0 0 0 4px #0e5a58aa
+      }
+
+      to {
+        box-shadow: 0 0 0 0 #0e5a5800
+      }
+    }
+
+    .zrep {
+      display: none;
+      font-family: "Courier Prime", "Courier New", monospace;
+      font-size: 14px
+    }
+
+    dialog {
+      border: 0;
+      border-radius: 18px;
+      padding: 20px;
+      width: min(420px, 92vw);
+      box-shadow: 0 20px 60px #0006
+    }
+
+    dialog::backdrop {
+      background: #14213dcc
+    }
+
+    dialog h2 {
+      margin: 0 0 4px
+    }
+
+    @media(min-width:861px) {
+      body {
+        padding-bottom: 40px
+      }
+
+      header {
+        padding: 10px 24px
+      }
+
+      nav {
+        position: static;
+        margin-left: auto;
+        background: none;
+        border: 0;
+        padding: 0;
+        gap: 4px;
+        order: 2
+      }
+
+      nav button {
+        flex: none;
+        display: block;
+        min-height: 44px;
+        padding: 0 16px;
+        border-radius: 10px;
+        color: #b9c4d6;
+        font-size: 15px;
+        box-shadow: none !important
+      }
+
+      nav button i {
+        display: none
+      }
+
+      nav button.on {
+        background: #fff;
+        color: var(--ink)
+      }
+
+      .chip {
+        margin-left: 0;
+        order: 3
+      }
+
+      #bar {
+        display: none !important
+      }
+
+      #toast {
+        bottom: 24px
+      }
+    }
+
+    @media(max-width:860px) {
+
+      .grid,
+      .grid.two {
+        grid-template-columns: 1fr
+      }
+
+      .receipt {
+        position: static
+      }
+    }
+
+    @media(max-width:400px) {
+      .pm {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .chip {
+        display: none
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0
+      }
+
+      header,
+      nav,
+      #bar,
+      .noprint,
+      .col,
+      #products,
+      #sales,
+      #shift,
+      #toast,
+      dialog {
+        display: none !important
+      }
+
+      main {
+        margin: 0;
+        padding: 0
+      }
+
+      .grid {
+        display: block
+      }
+
+      .receipt {
+        position: static
+      }
+
+      .paper {
+        box-shadow: none;
+        width: 72mm;
+        margin: 0 auto
+      }
+
+      .paper::after {
+        display: none
+      }
+
+      .po {
+        display: inline
+      }
+
+      body.zp main {
+        display: none !important
+      }
+
+      body.zp .zrep {
+        display: block;
+        width: 72mm;
+        margin: 0 auto
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand"><span id="storeName"></span><small>ScanTill</small></div>
+    <nav id="tabs"><button data-t="checkout" class="on"><i>▥</i>Sell</button><button
+        data-t="products"><i>☰</i>Products</button><button data-t="sales"><i>◔</i>Sales</button><button
+        data-t="shift"><i>⏱</i>Shift</button></nav>
+    <span class="chip" id="chip"></span>
+  </header>
+  <main>
+    <section id="checkout" class="tab on">
+      <div class="grid">
+        <div class="col">
+          <div class="card">
+            <div class="viewer"><video id="video" playsinline muted></video>
+              <div id="ph">
+                <div style="font-size:34px">▥</div><b>Camera is off</b>
+                <div class="hint" style="color:#9fb0b6;margin:4px 0 0">A USB scanner works too. Just scan.</div>
+              </div><i class="laser" id="laser"></i>
+            </div>
+            <div class="row"><button class="btn p big" id="camOn">Start camera</button><button class="btn" id="camOff"
+                disabled>Stop</button></div>
+            <label class="sw"><input type="checkbox" id="auto" checked>Add known items automatically</label>
+            <div class="row" style="margin-top:0"><input class="big2" id="code" placeholder="Barcode or product name"
+                autocomplete="off" inputmode="search"><button class="btn p" id="go">Find</button></div>
+            <p class="hint" id="msg" role="status">Ready. Scan the first item.</p>
+            <div class="found" id="found" hidden>
+              <input class="w" id="fName" aria-label="Product name" style="font-weight:700">
+              <div class="fc" id="fCode"></div>
+              <div id="pinfo"></div>
+              <a id="webq" target="_blank" rel="noopener" class="lnk" hidden>Search this barcode</a><a id="hyq"
+                target="_blank" rel="noopener" class="lnk" hidden>Check price on Hyper One</a>
+              <div class="f2">
+                <div><label class="lb" for="fPrice">Price (EGP)</label><input class="w" id="fPrice" type="number"
+                    min="0" step="any" inputmode="decimal"></div>
+                <div><label class="lb" for="fQty">Quantity</label><input class="w" id="fQty" type="number" min="1"
+                    step="1" value="1" inputmode="numeric"></div>
+              </div>
+              <label class="sw" id="saveRow"><input type="checkbox" id="fSave">Save this product and price</label>
+              <div class="row"><button class="btn p big" id="addBtn">Add to receipt</button><button class="btn"
+                  id="cancelBtn">Cancel</button></div>
+            </div>
+            <div class="found" id="picks" hidden></div>
+            <div class="heldBox" id="heldBox" hidden></div>
+          </div>
+        </div>
+        <aside class="receipt">
+          <div class="paper">
+            <div class="ph2"><b id="pStore"></b>
+              <div id="pMeta"></div>
+            </div>
+            <div id="lines"></div>
+            <div id="totals"></div>
+            <div class="ph2" style="border:0;margin:14px 0 0;padding:0">
+              <div id="pThanks"></div>
+            </div>
+          </div>
+          <div class="card noprint" id="payCard">
+            <div class="row" style="margin-top:0"><span class="lb">Discount</span><select id="dt">
+                <option value="pct">%</option>
+                <option value="amt">EGP</option>
+              </select><input id="dv" type="number" min="0" step="any" value="0" style="width:100px"
+                inputmode="decimal"></div>
+            <div class="lb">Payment method</div>
+            <div class="pm" id="pm"><button data-m="cash" class="on">Cash</button><button
+                data-m="visa">Visa</button><button data-m="instapay">InstaPay</button><button
+                data-m="wallet">Wallet</button></div>
+            <div id="cashBox"><label class="lb" for="cash">Cash received</label><input class="w big2" id="cash"
+                type="number" min="0" step="any" placeholder="0.00" inputmode="decimal">
+              <div class="row" id="quick"></div>
+            </div>
+            <div id="refBox" hidden><label class="lb" for="ref" id="refLb"></label><input class="w" id="ref"
+                autocomplete="off"></div>
+            <div class="chg" id="chg"></div>
+            <div class="row"><button class="btn p big" id="done" disabled>Complete sale</button></div>
+            <div class="row"><button class="btn big" id="hold">Hold</button><button class="btn big"
+                id="prt">Print</button><button class="btn d big" id="clr">Clear</button></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="products" class="tab">
+      <div class="grid two">
+        <div class="card">
+          <h2>Add or edit a product</h2>
+          <label class="lb" for="dbCode">Barcode, or 5-digit PLU for weighed items</label>
+          <div class="row" style="margin-top:0"><input id="dbCode" class="big2" inputmode="numeric"><button class="btn"
+              id="dbFind">Look up</button></div>
+          <label class="lb" for="dbName">Product name</label><input id="dbName" class="w">
+          <div class="f2">
+            <div><label class="lb" for="dbType">Pricing</label><select id="dbType" class="w">
+                <option value="fixed">Per item</option>
+                <option value="weight">Per kilogram</option>
+              </select></div>
+            <div><label class="lb" for="dbPrice">Price (EGP)</label><input id="dbPrice" type="number" min="0" step="any"
+                class="w" inputmode="decimal"></div>
+          </div>
+          <p class="hint" id="wh">Price for one item.</p>
+          <div class="row"><button class="btn p big" id="sp">Save product</button></div>
+        </div>
+        <div class="card">
+          <h2>Saved products <span id="dbn"></span></h2>
+          <div class="row" style="margin-top:0"><input class="big2" id="dq"
+              placeholder="Filter by name or barcode"><button class="btn" id="ex">Export</button><button class="btn"
+              id="imb">Import</button><input id="im" type="file" accept=".json" hidden></div>
+          <div id="dbl"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sales" class="tab">
+      <div class="grid two">
+        <div class="card">
+          <h2>Store settings</h2>
+          <label class="lb" for="sName">Store name (printed on receipts)</label><input id="sName" class="w">
+          <label class="lb" for="sTax">Tax rate (%)</label><input id="sTax" type="number" min="0" step="any" class="w"
+            inputmode="decimal">
+          <label class="lb" for="sLang">Product names from the online database</label><select id="sLang" class="w">
+            <option value="en">English</option>
+            <option value="ar">Arabic (when available)</option>
+          </select>
+          <p class="hint">Changes save automatically. Products, sales and the open receipt are stored on this device
+            only.</p>
+        </div>
+        <div class="card">
+          <h2>Today <span id="sum"></span></h2>
+          <div id="sl"></div>
+          <div class="row"><button class="btn" id="csv">Export all sales (CSV)</button><button class="btn d"
+              id="wipe">Clear sales history</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="shift" class="tab">
+      <div class="grid two">
+        <div class="card">
+          <h2>Current shift</h2>
+          <div id="shInfo"></div>
+          <div id="shTot"></div>
+          <div class="row"><button class="btn" id="mv">Cash in / out</button></div>
+          <label class="lb" for="count">Cash counted in the drawer (EGP)</label><input id="count" type="number" min="0"
+            step="any" class="w" inputmode="decimal">
+          <div class="chg" id="var"></div>
+          <div class="row"><button class="btn p big" id="endShift">End shift and print report</button></div>
+        </div>
+        <div class="card">
+          <h2>Past shifts</h2>
+          <div id="psl"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="bar" hidden>
+    <div><small id="bCount"></small><b id="bTot"></b></div><button class="btn" id="bPay"
+      style="background:#fff">Pay</button>
+  </div>
+  <div id="toast" hidden role="status"></div>
+  <div class="zrep" id="zrep"></div>
+  <dialog id="dlg">
+    <h2>Start shift</h2>
+    <p class="hint" style="margin:0 0 4px">Count the cash in the drawer before the first sale.</p>
+    <label class="lb" for="shName">Cashier name</label><input id="shName" class="w" autocomplete="off">
+    <label class="lb" for="shFloat">Opening cash in drawer (EGP)</label><input id="shFloat" type="number" min="0"
+      step="any" class="w" inputmode="decimal">
+    <div class="row"><button class="btn p big" id="shGo">Start shift</button><button class="btn"
+        id="shLater">Later</button></div>
+  </dialog>
+
+  <script>
+    const $ = i => document.getElementById(i), esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const ld = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch (e) { return d } }, sv = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } };
+    const dl = (n, t, m) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t], { type: m })); a.download = n; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1e4) };
+    const rd = x => Math.round((x + Number.EPSILON) * 100) / 100, money = n => 'EGP ' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    let db = ld('scantill-products-v1', {}), cart = ld('scantill-cart', []), sales = ld('scantill-sales', []), cfg = { store: 'Fazara', tax: 0, no: 1, lang: 'en', ...ld('scantill-cfg', {}) }, shift = ld('scantill-shift', null), shifts = ld('scantill-shifts', []), held = ld('scantill-held', []), pay = 'cash', disc = { t: 'pct', v: 0 }, cur = null, stream = null, loop = null, det = null, last = '', lastAt = 0, ac, tt, pk = [], dbInfo = null;
+    if (cfg.store === 'My Store') cfg.store = 'Fazara';
+    const saveDB = () => sv('scantill-products-v1', db), pad = n => '#' + String(n).padStart(4, '0'), msg = t => $('msg').textContent = t, tab = () => document.querySelector('.tab.on').id;
+    const PM = { cash: 'Cash', visa: 'Visa', instapay: 'InstaPay', wallet: 'Wallet' }, REF = { visa: 'Card approval code or last 4 digits (optional)', instapay: 'InstaPay reference number (optional)', wallet: 'Wallet number or transaction ID (optional)' };
+    const fmt = t => new Date(t).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }), sum = (a, f) => rd(a.reduce((x, i) => x + f(i), 0));
+    const rowH = (a, b, k = '') => `<div class="tr ${k}"><span>${a}</span><span>${b}</span></div>`;
+    const today = () => sales.filter(s => new Date(s.at).toDateString() === new Date().toDateString());
+    function beep(ok = true) { try { ac = ac || new AudioContext(); ac.resume && ac.resume(); const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = ok ? 1040 : 280; g.gain.value = .08; o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + .1) } catch (e) { } try { navigator.vibrate && navigator.vibrate(ok ? 30 : [60, 40, 60]) } catch (e) { } }
+    function toast(t, act, fn) { const e = $('toast'); e.innerHTML = '<span>' + esc(t) + '</span>' + (act ? '<button>' + act + '</button>' : ''); if (act) e.querySelector('button').onclick = () => { fn(); e.hidden = true }; e.hidden = false; clearTimeout(tt); tt = setTimeout(() => e.hidden = true, act ? 5000 : 2400) }
+    function setDb(code, p) { const k = p.type === 'weight' && /^\d{5}$/.test(code) ? 'PLU:' + code : code; db[k] = p; saveDB() }
+    function weighted(c) { if (!/^2\d{12}$/.test(c)) return null; const p = db['PLU:' + c.slice(2, 7)]; if (!p || p.type !== 'weight') return null; const g = +c.slice(7, 12); return g > 0 && g <= 100000 ? { p, g } : null }
+    const shTotals = id => { const T = { n: 0, total: 0, disc: 0, voids: 0, by: { cash: { n: 0, t: 0 }, visa: { n: 0, t: 0 }, instapay: { n: 0, t: 0 }, wallet: { n: 0, t: 0 } } }; sales.filter(x => x.shift === id).forEach(x => { if (x.void) { T.voids++; return } T.n++; T.total = rd(T.total + x.total); T.disc = rd(T.disc + (x.d || 0)); const b = T.by[x.method || 'cash']; if (b) { b.n++; b.t = rd(b.t + x.total) } }); return T };
+    const moved = () => sum(shift.moves || [], m => m.amt), expCash = () => rd(shift.float + shTotals(shift.id).by.cash.t + moved());
+    function setPay(m) { pay = m;[...$('pm').children].forEach(x => x.classList.toggle('on', x.dataset.m === m)); $('refLb').textContent = REF[m] || '' }
+    const payRows = (m, t, c) => rowH('Paid by', PM[m]) + (m === 'cash' && c >= 0 ? rowH('Cash', money(c)) + (c >= t.total ? rowH('Change', money(rd(c - t.total))) : '') : '');
+    function printDoc(h) { $('zrep').innerHTML = h; document.body.classList.add('zp'); addEventListener('afterprint', () => document.body.classList.remove('zp'), { once: true }); window.print() }
+    const rHtml = s => `<div class="ph2"><b>${esc(cfg.store)}</b><div>${pad(s.no)} · ${fmt(s.at)}${s.cashier ? ' · ' + esc(s.cashier) : ''}</div></div>` + s.items.map(i => `<div class="ln" style="grid-template-columns:1fr auto"><div class="nm">${esc(i.name)}<small>${i.qty} × ${money(i.price)}</small></div><div class="amt">${money(i.price * i.qty)}</div></div>`).join('') + rowH('Subtotal', money(s.sub)) + (s.d ? rowH('Discount', '− ' + money(s.d)) : '') + (s.tax ? rowH('Tax', money(s.tax)) : '') + rowH('TOTAL', money(s.total), 'g') + payRows(s.method || 'cash', s, s.cash ?? -1) + (s.ref ? rowH('Ref', esc(s.ref)) : '') + `<div class="ph2" style="border:0"><div>Thank you for shopping at ${esc(cfg.store)}</div></div>` + (s.void ? '<div class="ph2"><b>VOIDED</b></div>' : '');
+    const zHtml = r => `<div class="ph2"><b>${esc(cfg.store)}</b><div>Shift report</div></div>` + rowH('Cashier', esc(r.cashier)) + rowH('Opened', fmt(r.start)) + rowH('Closed', fmt(r.end)) + '<div class="ph2"></div>' + Object.keys(PM).map(k => rowH(PM[k] + ' (' + r.T.by[k].n + ')', money(r.T.by[k].t))).join('') + rowH('TOTAL SALES (' + r.T.n + ')', money(r.T.total), 'g') + rowH('Discounts given', money(r.T.disc)) + rowH('Voided receipts', r.T.voids) + '<div class="ph2"></div>' + rowH('Opening cash', money(r.float)) + (r.mv ? rowH('Cash in/out', money(r.mv)) : '') + rowH('Expected cash', money(r.expected)) + rowH('Counted cash', money(r.counted)) + rowH('Difference', (r.diff > 0 ? '+' : '') + money(r.diff), 'g');
+
+    /* tabs */
+    function go(t) { document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('.tab').forEach(s => s.classList.toggle('on', s.id === t)); if (t !== 'checkout' && stream) camOff(true); ({ checkout: render, products: renderDB, sales: renderSales, shift: renderShift })[t](); scrollTo(0, 0) }
+    document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.t));
+    /* USB scanners type like a keyboard: send keystrokes to the search box (but never steal them from a field) */
+    document.addEventListener('keydown', e => { if (tab() === 'checkout' && !$('dlg').open && !/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName) && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) $('code').focus() });
+
+    /* shifts */
+    function startDlg() { $('shName').value = cfg.cashier || ''; $('shFloat').value = cfg.float ?? ''; if (!$('dlg').open) $('dlg').showModal() }
+    function updVar() { const v = $('var'), c = parseFloat($('count').value); v.className = 'chg'; v.textContent = ''; if (!shift || !(c >= 0)) return; const d = rd(c - expCash()); v.textContent = d === 0 ? 'Drawer is balanced' : (d > 0 ? 'Over by ' : 'Short by ') + money(Math.abs(d)); v.classList.add(d === 0 ? 'ok' : 'bad') }
+    function renderShift() {
+      $('psl').innerHTML = shifts.length ? shifts.slice(-8).reverse().map(r => `<div class="ln"><div class="nm">${esc(r.cashier)}<small>${fmt(r.start)} · ${money(r.T.total)} · ${r.diff === 0 ? 'balanced' : (r.diff > 0 ? 'over ' : 'short ') + money(Math.abs(r.diff))}</small></div><span></span><button class="lnk" data-z="${r.id}">Reprint</button></div>`).join('') : '<div class="empty">Closed shifts appear here.</div>';
+      if (!shift) { $('shInfo').innerHTML = '<div class="empty">No shift is open.</div><div class="row"><button class="btn p big" onclick="startDlg()">Start shift</button></div>'; $('shTot').innerHTML = ''; return }
+      const T = shTotals(shift.id);
+      $('shInfo').innerHTML = rowH('Cashier', '<b>' + esc(shift.cashier) + '</b>') + rowH('Started', fmt(shift.start)) + rowH('Opening cash', money(shift.float));
+      $('shTot').innerHTML = Object.keys(PM).map(k => rowH(PM[k] + ' (' + T.by[k].n + ')', money(T.by[k].t))).join('') + rowH('Total sales (' + T.n + ')', money(T.total), 'g') + (moved() ? rowH('Cash in/out', money(moved())) : '') + rowH('Expected cash in drawer', '<b>' + money(expCash()) + '</b>'); updVar()
+    }
+    function endShift() {
+      if (!shift) { startDlg(); return }
+      const cnt = parseFloat($('count').value); if (!(cnt >= 0)) { toast('Count the cash in the drawer and enter the amount first.'); $('count').focus(); return }
+      if (cart.length && !confirm('There is an open receipt. End the shift anyway?')) return;
+      const exp = expCash(), r = { ...shift, end: Date.now(), counted: cnt, expected: exp, diff: rd(cnt - exp), mv: moved(), T: shTotals(shift.id) };
+      shifts.push(r); sv('scantill-shifts', shifts); shift = null; sv('scantill-shift', null); $('count').value = ''; dayChip(); renderShift(); printDoc(zHtml(r)); startDlg()
+    }
+    function hold() { if (!cart.length) return; held.push({ id: Date.now(), at: Date.now(), cart, disc }); sv('scantill-held', held); cart = []; disc = { t: 'pct', v: 0 }; $('dv').value = 0; $('dt').value = 'pct'; $('cash').value = ''; render(); renderHeld(); toast('Sale held. Resume it from the list under the scanner.') }
+    function renderHeld() { const b = $('heldBox'); b.hidden = !held.length; b.innerHTML = held.length ? '<b>Held sales</b>' + held.map(h => `<div class="row"><span style="flex:1">${new Date(h.at).toLocaleTimeString('en-GB', { timeStyle: 'short' })} · ${h.cart.reduce((a, i) => a + i.qty, 0)} items · ${money(h.cart.reduce((a, i) => a + i.price * i.qty, 0))}</span><button class="lnk" data-r="${h.id}">Resume</button><button class="lnk" data-d="${h.id}">Delete</button></div>`).join('') : '' }
+
+    /* camera */
+    async function camOn() {
+      if (!('BarcodeDetector' in window)) { msg('This browser can’t scan with the camera. Use Chrome on Android, a USB scanner, or type the barcode.'); return }
+      try {
+        det = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'itf', 'qr_code'] });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+        const v = $('video'); v.srcObject = stream; v.style.display = 'block'; $('ph').hidden = true; $('laser').style.display = 'block'; await v.play();
+        $('camOn').disabled = true; $('camOff').disabled = false; msg('Camera on. Hold a barcode inside the view.');
+        loop = setInterval(async () => { if (!v.videoWidth || $('go').disabled || !$('found').hidden || !$('picks').hidden) return; try { const c = await det.detect(v); if (c.length) { const code = c[0].rawValue, n = Date.now(); if (code !== last || n - lastAt > 2500) { last = code; lastAt = n; $('code').value = code; find(code, true) } } } catch (e) { } }, 350);
+      } catch (e) { camOff(true); msg('Couldn’t open the camera. Allow camera access, use HTTPS or localhost, or type the barcode.') }
+    }
+    function camOff(quiet) { clearInterval(loop); if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; const v = $('video'); v.srcObject = null; v.style.display = 'none'; $('ph').hidden = false; $('laser').style.display = 'none'; $('camOn').disabled = false; $('camOff').disabled = true; if (quiet !== true) msg('Camera stopped.') }
+
+    /* Open Food Facts lookup */
+    const toItem = (p, q) => { const nm = (cfg.lang === 'ar' && p.product_name_ar) || p.product_name_en || p.product_name || p.abbreviated_product_name || 'Unnamed product', i = { brand: p.brands || '', qty: p.quantity || '', img: p.image_front_small_url || '', cat: (p.categories || '').split(',').slice(-2).join(',').trim() }; return { name: [i.brand.split(',')[0], nm, i.qty].filter(Boolean).join(' '), type: 'fixed', price: '', web: 1, code: p.code || q, info: i } };
+    async function web(q) {
+      q = String(q || '').trim(); if (!q) return [];
+      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 7000);
+      try {
+        if (/^\d{8,14}$/.test(q)) { const r = await fetch('https://world.openfoodfacts.org/api/v2/product/' + encodeURIComponent(q) + '.json', { signal: ctl.signal }); if (!r.ok) return []; const d = await r.json(); return d.status === 1 && d.product ? [toItem({ ...d.product, code: d.product.code || q }, q)] : [] }
+        const r = await fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms=' + encodeURIComponent(q) + '&search_simple=1&action=process&json=1&page_size=5', { signal: ctl.signal }); if (!r.ok) return []; const d = await r.json();
+        return (d.products || []).filter(p => p.code).map(p => toItem(p, q))
+      } catch (e) { return [] } finally { clearTimeout(to) }
+    }
+    const infoHtml = i => { if (!i) return ''; const b = [i.brand, i.qty].filter(Boolean).map(esc).join(' · '); return b || i.img ? `<div class="pi">${i.img ? `<img src="${esc(i.img)}" alt="">` : ''}<div><div>${b}</div><small>${esc(i.cat || '')}</small></div></div>` : '' };
+    function picks(list) { pk = list; $('picks').hidden = false; $('picks').innerHTML = '<b>Choose a match</b>' + list.map((p, i) => `<div class="pk" data-i="${i}">${p.info.img ? `<img class="th" src="${esc(p.info.img)}" alt="">` : '<span class="th"></span>'}<div><b>${esc(p.name)}</b><small>${esc(p.code)}</small></div></div>`).join('') + '<button class="btn w" id="pkx" style="margin-top:8px">None of these</button>'; msg('Found ' + list.length + ' matches. Pick the right one.') }
+    async function find(q, scan) {
+      q = String(q || '').trim(); if (!q) { msg('Type or scan a barcode, or search by name.'); return }
+      cur = null; $('found').hidden = true; $('picks').hidden = true; msg('Looking up…'); $('go').disabled = true;
+      let p = db[q] || db['PLU:' + q] || null, code = q, g = null;
+      if (!p) { const w = weighted(q); if (w) { p = w.p; g = w.g } }
+      if (!p && navigator.onLine !== false) { const l = await web(q); if (l.length > 1 && !/^\d+$/.test(q)) { $('go').disabled = false; picks(l); return } if (l[0]) { p = l[0]; code = p.code || q } }
+      $('go').disabled = false; showProd(p, code, g, q, scan)
+    }
+    function showProd(p, code, g, q, scan) {
+      const known = !!p && !p.web, price = p ? (p.type === 'weight' ? (g ? rd(p.price * g / 1000) : '') : p.price) : '';
+      cur = { name: p ? p.name : (/^\d+$/.test(q) ? 'Unknown product' : q), code, price, grams: g, known, type: p && p.type, info: p && p.info };
+      if (scan && known && $('auto').checked && price > 0) { add(cur, 1); return }
+      $('fName').value = cur.name; $('fCode').textContent = code + (g ? ' · ' + g + ' g' : '') + (cur.type === 'weight' && !g ? ' · sold by weight' : ''); $('pinfo').innerHTML = infoHtml(cur.info);
+      const digits = /^\d{8,14}$/.test(code); $('webq').hidden = !(!p && digits); $('webq').href = 'https://www.google.com/search?q=' + encodeURIComponent(code + ' barcode'); $('hyq').hidden = !(digits && (!p || p.web)); $('hyq').href = 'https://www.hyperone.com.eg/ar/search?q=' + encodeURIComponent(code);
+      $('fPrice').value = price === '' ? '' : (+price).toFixed(2); $('fQty').value = 1; $('fSave').checked = !known && cur.type !== 'weight' && /^\d{6,14}$/.test(code); $('saveRow').hidden = known; $('found').hidden = false;
+      msg(known ? (price === '' ? 'Weighed item: enter the total price for this pack.' : 'Found. Check the price and add it.') : p ? 'Found online. Enter your shop price.' : 'No match. Enter a name and price.');
+      beep(!!p); $('found').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); if (matchMedia('(pointer:fine)').matches) { $('fPrice').focus(); $('fPrice').select() }
+    }
+    function add(i, q) {
+      const price = rd(i.price), l = cart.find(x => x.code === i.code && x.price === price && x.name === i.name);
+      l ? l.qty += q : cart.push({ id: Date.now() + Math.random(), name: i.name, code: i.code, price, qty: q });
+      cur = null; $('found').hidden = true; $('code').value = ''; msg('Added ' + i.name + '. Ready for the next item.'); beep(); render();
+      const pp = document.querySelector('.paper'); pp.classList.remove('flash'); void pp.offsetWidth; pp.classList.add('flash');
+      if (matchMedia('(pointer:fine)').matches) $('code').focus()
+    }
+    function addCard() {
+      const pr = parseFloat($('fPrice').value), q = Math.floor($('fQty').value);
+      if (!(pr >= 0) || $('fPrice').value === '' || !(q >= 1)) { toast('Enter a valid price and quantity.'); beep(false); return }
+      cur.name = $('fName').value.trim() || cur.name;
+      if ($('fSave').checked && !cur.known) { if (cur.name === 'Unknown product') { toast('Give the product a name to save it.'); $('fName').focus(); return } setDb(cur.code, { name: cur.name, price: pr, type: 'fixed', info: cur.info }) }
+      add({ ...cur, price: pr }, q)
+    }
+
+    /* receipt */
+    function tot() { const sub = cart.reduce((s, i) => s + i.price * i.qty, 0), d = disc.t === 'pct' ? sub * Math.min(disc.v, 100) / 100 : Math.min(disc.v, sub), tax = (sub - d) * cfg.tax / 100; return { sub: rd(sub), d: rd(d), tax: rd(tax), total: rd(sub - d + tax) } }
+    function render() {
+      const t = tot(), c = parseFloat($('cash').value), has = cart.length > 0;
+      $('cashBox').hidden = pay !== 'cash'; $('refBox').hidden = pay === 'cash'; $('refLb').textContent = REF[pay] || ''; $('done').textContent = 'Complete sale · ' + PM[pay]; $('pThanks').textContent = 'Thank you for shopping at ' + cfg.store;
+      $('pStore').textContent = cfg.store; $('storeName').textContent = cfg.store; $('pMeta').textContent = pad(cfg.no) + ' · ' + fmt(Date.now()) + (shift ? ' · ' + shift.cashier : '');
+      $('lines').innerHTML = has ? cart.map(i => `<div class="ln"><div class="nm">${esc(i.name)}<small>${money(i.price)}<span class="po"> × ${i.qty}</span></small></div><div class="q noprint"><button data-id="${i.id}" data-d="-1" aria-label="Fewer">−</button><b>${i.qty}</b><button data-id="${i.id}" data-d="1" aria-label="More">+</button></div><div class="amt">${money(i.price * i.qty)}</div></div>`).join('') : '<div class="empty">Nothing scanned yet.<br>Scan a barcode or search for an item to start a sale.</div>';
+      $('totals').innerHTML = has ? rowH('Subtotal', money(t.sub)) + (t.d ? rowH('Discount', '− ' + money(t.d)) : '') + (cfg.tax ? rowH('Tax ' + cfg.tax + '%', money(t.tax)) : '') + rowH('TOTAL', money(t.total), 'g') + payRows(pay, t, c) : '';
+      const ch = $('chg'); ch.className = 'chg'; ch.textContent = '';
+      if (has && pay === 'cash' && c >= 0) { if (c >= t.total) { ch.textContent = 'Change due ' + money(rd(c - t.total)); ch.classList.add('ok') } else { ch.textContent = 'Short by ' + money(rd(t.total - c)); ch.classList.add('bad') } }
+      $('done').disabled = !has; sv('scantill-cart', cart);
+      $('bar').hidden = !has || tab() !== 'checkout'; $('bCount').textContent = cart.reduce((a, i) => a + i.qty, 0) + ' items'; $('bTot').textContent = money(t.total);
+      const q = $('quick'); q.innerHTML = ''; if (has && pay === 'cash') { [['Exact', t.total], ...[50, 100, 200, 500].map(n => [n, n])].forEach(([l, v]) => { const b = document.createElement('button'); b.className = 'btn'; b.textContent = l; b.onclick = () => { $('cash').value = v; render() }; q.append(b) }) }
+    }
+    $('lines').onclick = e => {
+      const b = e.target.closest('button[data-id]'); if (!b) return; const i = cart.find(x => String(x.id) === b.dataset.id); if (!i) return; i.qty += +b.dataset.d;
+      if (i.qty < 1) { const idx = cart.indexOf(i); cart.splice(idx, 1); toast('Removed ' + i.name, 'Undo', () => { i.qty = 1; cart.splice(idx, 0, i); render() }) }
+      render()
+    };
+    function done() {
+      if (!cart.length) return; if (!shift) { startDlg(); return }
+      const t = tot(), c = parseFloat($('cash').value);
+      if (pay === 'cash' && c >= 0 && c < t.total) { toast('Cash received is less than the total.'); beep(false); return }
+      sales.push({ no: cfg.no, at: Date.now(), shift: shift.id, cashier: shift.cashier, method: pay, ref: pay === 'cash' ? '' : $('ref').value.trim(), items: cart.map(i => ({ name: i.name, code: i.code, price: i.price, qty: i.qty })), ...t, cash: pay === 'cash' && c >= 0 ? c : null }); sv('scantill-sales', sales);
+      toast('Sale ' + pad(cfg.no) + ' complete · ' + PM[pay] + ' · ' + money(t.total)); cfg.no++; sv('scantill-cfg', cfg); cart = []; disc = { t: 'pct', v: 0 }; $('dv').value = 0; $('dt').value = 'pct'; $('cash').value = ''; $('ref').value = ''; setPay('cash'); beep(); render(); dayChip(); scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    function dayChip() { const T = shift && shTotals(shift.id); $('chip').textContent = shift ? shift.cashier + ' · ' + T.n + ' sale' + (T.n === 1 ? '' : 's') + ' · ' + money(T.total) : 'No shift open' }
+
+    /* products */
+    function renderDB() {
+      const q = $('dq').value.toLowerCase(), es = Object.entries(db).filter(([k, p]) => (k + ' ' + p.name).toLowerCase().includes(q));
+      $('dbn').textContent = '(' + Object.keys(db).length + ')';
+      $('dbl').innerHTML = es.length ? es.map(([k, p]) => `<div class="ln"><div class="nm">${esc(p.name)}<small>${esc(k.replace('PLU:', 'PLU '))}</small></div><div class="amt">${money(p.price)}${p.type === 'weight' ? '/kg' : ''}</div><div><button class="lnk" data-e="${esc(k)}">Edit</button><button class="lnk" data-x="${esc(k)}">Delete</button></div></div>`).join('') : '<div class="empty">No products found. Save one with its barcode and price.</div>'
+    }
+    $('dbl').onclick = e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.e !== undefined) { const k = b.dataset.e, p = db[k]; $('dbCode').value = k.replace('PLU:', ''); $('dbName').value = p.name; $('dbType').value = p.type; $('dbPrice').value = p.price; dbInfo = p.info || null; $('dbType').onchange(); $('dbCode').scrollIntoView({ behavior: 'smooth', block: 'center' }) }
+      if (b.dataset.x !== undefined) { const k = b.dataset.x, p = db[k]; delete db[k]; saveDB(); renderDB(); toast('Deleted ' + p.name, 'Undo', () => { db[k] = p; saveDB(); renderDB() }) }
+    };
+    $('dbType').onchange = () => $('wh').textContent = $('dbType').value === 'weight' ? 'Price per kg. Use the 5-digit item code from your scale labels; ScanTill reads the weight (grams) from the rest of the label. Example: 100 EGP/kg × 578 g = 57.80 EGP.' : 'Price for one item.';
+    $('sp').onclick = () => {
+      const code = $('dbCode').value.trim(), name = $('dbName').value.trim(), price = parseFloat($('dbPrice').value);
+      if (!code || !name || !(price >= 0)) { toast('Enter a barcode, a name and a valid price.'); return }
+      const type = $('dbType').value; if (type === 'weight' && !/^\d{5}$/.test(code)) { toast('Weighed items need a 5-digit PLU code.'); return }
+      delete db[code]; delete db['PLU:' + code]; setDb(code, { name, price, type, info: dbInfo || undefined }); dbInfo = null;['dbCode', 'dbName', 'dbPrice'].forEach(i => $(i).value = ''); renderDB(); toast('Saved ' + name)
+    };
+    $('dq').oninput = renderDB;
+    $('ex').onclick = () => dl('scantill-products.json', JSON.stringify(db, null, 1), 'application/json'); $('imb').onclick = () => $('im').click();
+    $('im').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { try { const o = JSON.parse(t); if (!o || typeof o !== 'object' || Array.isArray(o)) throw 0; let n = 0; for (const [k, p] of Object.entries(o)) if (p && p.name && p.price >= 0) { db[k] = { name: String(p.name), price: +p.price, type: p.type === 'weight' ? 'weight' : 'fixed', info: p.info && typeof p.info === 'object' ? p.info : undefined }; n++ } saveDB(); renderDB(); toast('Imported ' + n + ' products') } catch (x) { toast('That file isn’t a ScanTill product list.') } }); e.target.value = '' };
+    $('dbFind').onclick = async () => { const c = $('dbCode').value.trim(); if (!/^\d{8,14}$/.test(c)) { toast('Enter a barcode of 8 to 14 digits first.'); return } $('dbFind').disabled = true; const l = await web(c); $('dbFind').disabled = false; if (l[0]) { $('dbName').value = l[0].name; dbInfo = l[0].info; toast('Found online. Add your price and save.'); $('dbPrice').focus() } else toast('Not found online. Enter the details by hand.') };
+
+    /* sales + settings */
+    function renderSales() {
+      const t = today(), L = t.filter(s => !s.void); $('sum').textContent = t.length ? '(' + L.length + ' sales · ' + money(sum(L, s => s.total)) + ')' : '';
+      $('sl').innerHTML = t.length ? t.slice().reverse().map(s => `<div class="ln${s.void ? ' vd' : ''}"><div class="nm">${pad(s.no)}${s.void ? ' (voided)' : ''}<small>${new Date(s.at).toLocaleTimeString('en-GB', { timeStyle: 'short' })} · ${s.items.reduce((a, i) => a + i.qty, 0)} items · ${PM[s.method || 'cash']}${s.cashier ? ' · ' + esc(s.cashier) : ''}${s.ref ? ' · ' + esc(s.ref) : ''}</small></div><div class="amt">${money(s.total)}</div><div><button class="lnk" data-p="${s.no}">Reprint</button>${s.void ? '' : `<button class="lnk" data-v="${s.no}">Void</button>`}</div></div>`).join('') : '<div class="empty">No sales yet today. Completed sales appear here.</div>'
+    }
+    $('sName').oninput = () => { cfg.store = $('sName').value.trim() || 'Fazara'; sv('scantill-cfg', cfg); render() };
+    $('sTax').oninput = () => { cfg.tax = Math.max(0, parseFloat($('sTax').value) || 0); sv('scantill-cfg', cfg); render() };
+    $('sLang').onchange = () => { cfg.lang = $('sLang').value; sv('scantill-cfg', cfg) };
+    $('csv').onclick = () => { const q = v => '"' + String(v).replace(/"/g, '""') + '"'; dl('scantill-sales.csv', '\ufeffReceipt,Date,Items,Subtotal,Discount,Tax,Total,Method,Cashier,Status\n' + sales.map(s => [pad(s.no), new Date(s.at).toISOString(), q(s.items.map(i => i.qty + 'x ' + i.name).join('; ')), s.sub, s.d, s.tax, s.total, s.method || 'cash', q(s.cashier || ''), s.void ? 'void' : ''].join(',')).join('\n'), 'text/csv') };
+    $('wipe').onclick = () => { if (sales.length && confirm('Delete all saved sales? This can’t be undone.')) { sales = []; sv('scantill-sales', sales); renderSales(); dayChip() } };
+    $('sl').onclick = e => { const b = e.target.closest('button'); if (!b) return; const s = sales.find(x => String(x.no) === (b.dataset.p || b.dataset.v)); if (!s) return; if (b.dataset.p) printDoc(rHtml(s)); else if (confirm('Void receipt ' + pad(s.no) + '? It will be removed from the totals.')) { s.void = true; sv('scantill-sales', sales); renderSales(); dayChip() } };
+    $('psl').onclick = e => { const b = e.target.closest('button'), r = b && shifts.find(x => String(x.id) === b.dataset.z); if (r) printDoc(zHtml(r)) };
+
+    /* wiring */
+    $('camOn').onclick = camOn; $('camOff').onclick = () => camOff(); $('go').onclick = () => find($('code').value);
+    $('code').onkeydown = e => { if (e.key === 'Enter') find($('code').value, true) };
+    $('addBtn').onclick = addCard; $('cancelBtn').onclick = () => { cur = null; $('found').hidden = true; msg('Cancelled.') };
+    ['fPrice', 'fQty'].forEach(i => $(i).onkeydown = e => { if (e.key === 'Enter') addCard() });
+    $('dt').onchange = () => { disc.t = $('dt').value; render() }; $('dv').oninput = () => { disc.v = Math.max(0, parseFloat($('dv').value) || 0); render() }; $('cash').oninput = render;
+    $('done').onclick = done; $('prt').onclick = () => window.print(); $('clr').onclick = () => { if (cart.length && confirm('Clear this receipt?')) { cart = []; render() } };
+    $('pm').onclick = e => { const b = e.target.closest('button'); if (b) { setPay(b.dataset.m); render(); if (matchMedia('(pointer:fine)').matches) (b.dataset.m === 'cash' ? $('cash') : $('ref')).focus() } };
+    $('hold').onclick = hold; $('bPay').onclick = () => $('payCard').scrollIntoView({ behavior: 'smooth' });
+    $('heldBox').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.r) { if (cart.length) { toast('Hold or finish the current sale first.'); return } const h = held.find(x => String(x.id) === b.dataset.r); if (!h) return; cart = h.cart; disc = h.disc; $('dv').value = disc.v; $('dt').value = disc.t } held = held.filter(x => String(x.id) !== (b.dataset.r || b.dataset.d)); sv('scantill-held', held); render(); renderHeld() };
+    $('picks').onclick = e => { if (e.target.id === 'pkx') { $('picks').hidden = true; msg('Search again or enter the item by hand.'); return } const d = e.target.closest('.pk'); if (!d) return; const p = pk[+d.dataset.i]; $('picks').hidden = true; showProd(p, p.code, null, '', false) };
+    $('shGo').onclick = () => { const n = $('shName').value.trim(), f = parseFloat($('shFloat').value); if (!n || !(f >= 0)) { toast('Enter the cashier name and the opening cash amount.'); return } shift = { id: Date.now(), cashier: n, float: f, start: Date.now(), moves: [] }; cfg.cashier = n; cfg.float = f; sv('scantill-cfg', cfg); sv('scantill-shift', shift); $('dlg').close(); render(); dayChip(); renderShift(); toast('Shift started: ' + n) };
+    $('shLater').onclick = () => $('dlg').close();
+    $('endShift').onclick = endShift; $('count').oninput = updVar;
+    $('mv').onclick = () => { if (!shift) return; const a = parseFloat(prompt('Cash added (+) or taken out (−) of the drawer, in EGP. Example: -50')); if (!a) return; shift.moves = shift.moves || []; shift.moves.push({ amt: a, why: prompt('Reason (for example: supplier payment)') || '', at: Date.now() }); sv('scantill-shift', shift); renderShift() };
+    $('sName').value = cfg.store; $('sTax').value = cfg.tax; $('sLang').value = cfg.lang; setPay('cash'); $('dbType').onchange(); render(); dayChip(); renderHeld(); if (!shift) startDlg();
+    if (matchMedia('(pointer:fine)').matches) $('code').focus();
+  </script>
+</body>
+
+</html>
